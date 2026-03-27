@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EAC25 Portal">
+<link rel="manifest" href="manifest.json">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YQRFJRYQ1J"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-YQRFJRYQ1J');
+</script>
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>EAC25 — Class Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0f18;--surface:#111827;--surface2:#1a2435;--border:#1f3050;
+    --accent:#00d4ff;--accent2:#ff6b35;--text:#e8f0fe;--muted:#6b7fa3;
+    --green:#00e676;--red:#ff4444;--yellow:#ffd600;
+    --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+  /* HEADER */
+  header{position:sticky;top:0;z-index:100;background:rgba(10,15,24,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 1.25rem;display:flex;align-items:center;justify-content:space-between;height:56px;}
+  .logo{font-family:var(--mono);font-size:0.9rem;color:var(--accent);display:flex;align-items:center;gap:0.6rem;}
+  .logo-meta{font-size:0.58rem;color:var(--muted);letter-spacing:0.08em;}
+  .header-right{display:flex;align-items:center;gap:0.6rem;}
+  .section-toggle{display:flex;background:var(--surface2);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .seg-btn{font-family:var(--mono);font-size:0.68rem;padding:5px 15px;border:none;background:none;color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;}
+  .seg-btn.active{background:var(--accent);color:#000;font-weight:700;}
+  .admin-btn{font-family:var(--mono);font-size:0.65rem;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:5px 11px;border-radius:4px;cursor:pointer;transition:all 0.2s;}
+  .admin-btn:hover{color:var(--accent);border-color:var(--accent);}
+  .admin-btn.active{color:var(--accent2);border-color:var(--accent2);}
+
+  /* NAV */
+  .nav-tabs{display:flex;padding:0 1.25rem;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;position:relative;z-index:50;}
+  .nav-tabs::-webkit-scrollbar{display:none;}
+  .tab{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.08em;padding:13px 18px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;background:none;border-top:none;border-left:none;border-right:none;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+
+  /* MAIN */
+  main{max-width:920px;margin:0 auto;padding:1.75rem 1.25rem;position:relative;z-index:1;}
+  .section{display:none;}
+  .section.active{display:block;}
+  .sec-title{font-family:var(--mono);font-size:0.68rem;letter-spacing:0.15em;color:var(--accent);text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.75rem;}
+  .sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  /* TIMETABLE */
+  .tt-meta{display:flex;flex-wrap:wrap;gap:0.6rem 1.2rem;margin-bottom:1rem;align-items:center;}
+  .tt-meta-item{font-family:var(--mono);font-size:0.6rem;color:var(--muted);}
+  .tt-meta-item span{color:var(--accent);}
+
+  /* FOLDER STYLES */
+  .folder{background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.75rem;overflow:hidden;transition:border-color 0.2s;}
+  .folder:hover{border-color:rgba(0,212,255,0.3);}
+  .folder-header{display:flex;align-items:center;gap:0.75rem;padding:0.9rem 1.1rem;cursor:pointer;user-select:none;}
+  .folder-icon{font-size:1.1rem;flex-shrink:0;transition:transform 0.2s;}
+  .folder-header.open .folder-icon{transform:rotate(0deg);}
+  .folder-name{font-size:0.9rem;font-weight:700;flex:1;}
+  .folder-count{font-family:var(--mono);font-size:0.6rem;color:var(--muted);background:var(--surface2);padding:2px 8px;border-radius:20px;}
+  .folder-chevron{font-family:var(--mono);font-size:0.7rem;color:var(--muted);transition:transform 0.25s;}
+  .folder-header.open .folder-chevron{transform:rotate(90deg);}
+  .folder-body{display:none;border-top:1px solid var(--border);}
+  .folder-body.open{display:block;}
+  .folder-body .doc-item{border-radius:0;border-left:none;border-right:none;border-top:none;}
+  .folder-sort-bar{display:flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--surface2);border-bottom:1px solid var(--border);}
+  .sort-label{font-family:var(--mono);font-size:0.58rem;color:var(--muted);letter-spacing:0.08em;margin-right:0.2rem;}
+  .sort-btn{font-family:var(--mono);font-size:0.6rem;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;}
+  .sort-btn:hover{color:var(--text);border-color:var(--muted);}
+  .sort-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:700;}
+  .legend{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:0.58rem;color:var(--muted);}
+  .ldot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+  .day-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:0.85rem;transition:border-color 0.2s;}
+  .day-card.is-today{border-color:rgba(0,212,255,0.35);}
+  .day-hdr{background:var(--surface2);padding:9px 14px;font-family:var(--mono);font-size:0.68rem;letter-spacing:0.1em;color:var(--muted);display:flex;align-items:center;justify-content:space-between;}
+  .day-hdr.today-hdr{color:var(--accent);}
+  .today-badge{background:var(--accent);color:var(--bg);font-size:0.58rem;padding:2px 8px;border-radius:20px;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+  .periods-row{display:flex;flex-wrap:wrap;}
+  .period{padding:9px 12px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-width:100px;flex:1;}
+  .period:last-child{border-right:none;}
+  .p-time{font-family:var(--mono);font-size:0.56rem;color:var(--muted);margin-bottom:3px;}
+  .p-name{font-size:0.8rem;font-weight:700;color:var(--text);line-height:1.2;}
+  .p-code{font-family:var(--mono);font-size:0.56rem;color:var(--muted);margin-top:2px;}
+  .p-note{font-family:var(--mono);font-size:0.56rem;color:var(--muted);margin-top:1px;}
+
+  .cm{border-left:3px solid #7c3aed;}
+  .cb{border-left:3px solid #ff4daa;}
+  .cd{border-left:3px solid #00d4ff;}
+  .cn{border-left:3px solid #ffd600;}
+  .ce{border-left:3px solid #00e676;}
+  .cf{border-left:3px solid #ff6b35;}
+  .cl{border-left:3px solid #00bcd4;background:rgba(0,188,212,0.04);}
+  .cj{border-left:3px solid #a78bfa;}
+  .ck{border-left:3px solid #34d399;}
+  .cbreak{background:rgba(255,107,53,0.06);}
+  .cbreak .p-name{color:var(--muted);font-size:0.72rem;font-weight:400;}
+  .ceval{border-left:3px solid var(--red);background:rgba(255,68,68,0.04);}
+  .ceval .p-name{color:var(--red);}
+  .cpl{border-left:3px solid #a78bfa;background:rgba(167,139,250,0.04);}
+  .cpl .p-name{color:#a78bfa;font-size:0.74rem;}
+
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.1rem 1.25rem;margin-bottom:0.75rem;transition:all 0.2s;position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),transparent);opacity:0;transition:opacity 0.2s;}
+  .card:hover{border-color:var(--accent);transform:translateY(-1px);}
+  .card:hover::before{opacity:1;}
+  .card-meta{font-family:var(--mono);font-size:0.62rem;color:var(--muted);margin-bottom:0.4rem;display:flex;align-items:center;gap:0.5rem;}
+  .card-title{font-size:0.95rem;font-weight:700;margin-bottom:0.35rem;}
+  .card-body{font-size:0.85rem;color:#a0b0cc;line-height:1.6;}
+  .pdot{width:6px;height:6px;border-radius:50%;display:inline-block;}
+  .ph{background:var(--red);} .pm{background:var(--yellow);} .pl{background:var(--green);}
+  .card.bh{border-left:3px solid var(--red);}
+  .card.bm{border-left:3px solid var(--yellow);}
+  .card.bl{border-left:3px solid var(--green);}
+
+  /* DOCS */
+  .subj-group{margin-bottom:1.75rem;}
+  .subj-label{font-family:var(--mono);font-size:0.62rem;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;margin-bottom:0.6rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
+  .doc-item{display:flex;align-items:center;gap:0.85rem;padding:10px 13px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:0.45rem;transition:border-color 0.2s;}
+  .doc-item:hover{border-color:var(--accent);}
+  .doc-info{flex:1;min-width:0;}
+  .doc-name{font-size:0.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .doc-meta{font-family:var(--mono);font-size:0.58rem;color:var(--muted);margin-top:2px;}
+  .doc-icon{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+  /* Subject colours matching timetable */
+  .di-math  {background:#7c3aed;}
+  .di-prog  {background:#ff4daa;}
+  .di-de    {background:#00d4ff;}
+  .di-net   {background:#ffd600;}
+  .di-chse  {background:#00e676;}
+  .di-iot   {background:#ff6b35;}
+  .di-chem  {background:#34d399;}
+  .di-ggi   {background:#a78bfa;}
+  .di-lab   {background:#00bcd4;}
+  .di-gen   {background:#6b7fa3;}
+  .dl-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:4px;font-family:var(--mono);font-size:0.6rem;cursor:pointer;transition:all 0.2s;letter-spacing:0.05em;white-space:nowrap;flex-shrink:0;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+  .dl-btn:hover{background:var(--accent);border-color:var(--accent);color:var(--bg);}
+
+  /* DEADLINES */
+  .dl-item{display:flex;align-items:center;gap:1rem;padding:0.9rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.65rem;transition:transform 0.2s;}
+  .dl-item:hover{transform:translateX(4px);}
+  .dl-date{text-align:center;min-width:42px;}
+  .dl-day{font-family:var(--mono);font-size:1.3rem;font-weight:700;line-height:1;}
+  .dl-mon{font-family:var(--mono);font-size:0.57rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+  .dl-divider{width:1px;height:36px;background:var(--border);flex-shrink:0;}
+  .dl-info{flex:1;}
+  .dl-title{font-size:0.875rem;font-weight:700;margin-bottom:2px;}
+  .dl-sub{font-family:var(--mono);font-size:0.6rem;color:var(--muted);}
+  .days-pill{font-family:var(--mono);font-size:0.63rem;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+  .p-urgent{background:rgba(255,68,68,0.15);color:var(--red);}
+  .p-soon{background:rgba(255,214,0,0.15);color:var(--yellow);}
+  .p-ok{background:rgba(0,230,118,0.15);color:var(--green);}
+  .p-past{background:rgba(107,127,163,0.15);color:var(--muted);}
+
+  /* ADMIN */
+  #admin-panel{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
+  #admin-panel.open{display:flex;}
+  .admin-modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;width:100%;max-width:580px;padding:1.75rem;margin:auto;}
+  .admin-hdr{font-family:var(--mono);font-size:0.75rem;letter-spacing:0.15em;color:var(--accent2);text-transform:uppercase;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;}
+  .close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;line-height:1;}
+  .close-btn:hover{color:var(--text);}
+  .atabs{display:flex;gap:0.4rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+  .atab{font-family:var(--mono);font-size:0.63rem;padding:5px 12px;border-radius:4px;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;letter-spacing:0.05em;transition:all 0.2s;}
+  .atab.active{background:var(--accent2);border-color:var(--accent2);color:#000;}
+  .asec{display:none;}
+  .asec.active{display:block;}
+  .fg{margin-bottom:0.85rem;}
+  label{display:block;font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.35rem;text-transform:uppercase;}
+  input[type=text],input[type=date],input[type=password],textarea,select{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:0.85rem;outline:none;transition:border-color 0.2s;}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:72px;}
+  select option{background:var(--surface);}
+  .frow{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+  .sbtn{background:var(--accent2);color:#000;border:none;padding:9px 20px;border-radius:6px;font-family:var(--mono);font-size:0.72rem;letter-spacing:0.08em;cursor:pointer;font-weight:700;transition:all 0.2s;width:100%;margin-top:0.4rem;}
+  .sbtn:hover{opacity:0.85;transform:translateY(-1px);}
+  .sbtn.sec{background:var(--accent);}
+  .file-drop{border:2px dashed var(--border);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .file-drop:hover{border-color:var(--accent);background:rgba(0,212,255,0.03);}
+  .file-drop-txt{font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-top:0.35rem;}
+  #sel-file-nm{font-family:var(--mono);font-size:0.63rem;color:var(--accent);margin-top:0.4rem;}
+  .divider{height:1px;background:var(--border);margin:1.1rem 0;}
+  .lerr{font-family:var(--mono);font-size:0.63rem;color:var(--red);margin-top:0.35rem;display:none;}
+  .mg-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border:1px solid var(--border);border-radius:5px;margin-bottom:0.35rem;font-size:0.78rem;gap:0.5rem;}
+  .mg-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .delbtn{background:none;border:1px solid rgba(255,68,68,0.3);color:var(--red);padding:3px 9px;border-radius:4px;font-family:var(--mono);font-size:0.57rem;cursor:pointer;flex-shrink:0;}
+  .delbtn:hover{background:rgba(255,68,68,0.1);}
+  /* RICH TEXT TOOLBAR */
+  .toolbar{display:flex;flex-wrap:wrap;gap:0.35rem;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-bottom:none;border-radius:6px 6px 0 0;}
+  .tool-btn{font-family:var(--mono);font-size:0.68rem;padding:4px 9px;border-radius:4px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:all 0.15s;line-height:1.2;}
+  .tool-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .tool-btn.active{background:var(--accent);border-color:var(--accent);color:#000;}
+  .tool-hint{font-family:var(--mono);font-size:0.55rem;color:var(--muted);align-self:center;margin-left:auto;}
+  .toolbar + textarea{border-radius:0 0 6px 6px;border-top:none;}
+  /* RENDERED NOTICE BODY */
+  .notice-body{font-size:0.85rem;color:#a0b0cc;line-height:1.7;}
+  .notice-body ul{padding-left:1.2rem;margin:0.3rem 0;}
+  .notice-body li{margin-bottom:0.2rem;}
+  .notice-body b{color:var(--text);font-weight:700;}
+  .notice-body i{font-style:italic;}
+  .notice-body u{text-decoration:underline;}
+  .notice-body hr{border:none;border-top:1px solid var(--border);margin:0.6rem 0;}
+  /* EDIT BTN */
+  .editbtn{background:none;border:1px solid rgba(0,212,255,0.3);color:var(--accent);padding:3px 9px;border-radius:4px;font-family:var(--mono);font-size:0.57rem;cursor:pointer;flex-shrink:0;}
+  .editbtn:hover{background:rgba(0,212,255,0.1);}
+
+
+  .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#000;font-family:var(--mono);font-size:0.7rem;letter-spacing:0.06em;padding:10px 20px;border-radius:6px;z-index:999;transition:transform 0.3s ease;pointer-events:none;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .empty{text-align:center;padding:2.5rem;color:var(--muted);font-family:var(--mono);font-size:0.7rem;letter-spacing:0.08em;}
+  ::-webkit-scrollbar{width:4px;height:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  @media(max-width:600px){.frow{grid-template-columns:1fr;}.periods-row{flex-direction:column;}.period{border-right:none;min-width:unset;}.admin-modal{padding:1.25rem;}main{padding:1.25rem 0.9rem;}}
+
+  /* SEMESTER SELECTOR */
+  #sem-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;}
+  #sem-screen.hidden{display:none;}
+  .sem-logo{font-family:var(--mono);font-size:1.1rem;color:var(--accent);letter-spacing:0.15em;margin-bottom:0.4rem;}
+  .sem-sub{font-family:var(--mono);font-size:0.62rem;color:var(--muted);letter-spacing:0.1em;margin-bottom:3rem;}
+  .sem-heading{font-family:var(--sans);font-size:1.5rem;font-weight:800;color:var(--text);margin-bottom:0.4rem;text-align:center;}
+  .sem-hint{font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-bottom:2rem;text-align:center;}
+  .sem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;width:100%;max-width:480px;}
+  .sem-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.1rem 0.5rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+  .sem-card:hover{transform:translateY(-2px);}
+  .sem-card.available{border-color:var(--accent);}
+  .sem-card.available:hover{background:rgba(0,212,255,0.06);}
+  .sem-card.locked{opacity:0.5;cursor:pointer;}
+  .sem-card.locked:hover{border-color:var(--accent2);transform:translateY(-2px);}
+  .sem-card.current{border-color:var(--accent);background:rgba(0,212,255,0.07);}
+  .sem-num{font-family:var(--mono);font-size:1.4rem;font-weight:700;color:var(--accent);line-height:1;}
+  .sem-label{font-family:var(--mono);font-size:0.55rem;color:var(--muted);margin-top:4px;letter-spacing:0.08em;}
+  .sem-badge{position:absolute;top:6px;right:6px;font-family:var(--mono);font-size:0.48rem;padding:2px 5px;border-radius:3px;letter-spacing:0.05em;}
+  .sem-badge.live{background:var(--green);color:#000;}
+  .sem-badge.done{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+  /* joke modal */
+  #joke-modal{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
+  #joke-modal.open{display:flex;}
+  .joke-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:2.5rem 2rem;max-width:340px;width:90%;text-align:center;}
+  .joke-emoji{font-size:3rem;margin-bottom:1rem;display:block;}
+  .joke-text{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:0.5rem;line-height:1.4;}
+  .joke-sub{font-family:var(--mono);font-size:0.65rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+  .joke-close{background:var(--accent2);color:#000;border:none;padding:9px 24px;border-radius:6px;font-family:var(--mono);font-size:0.72rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+  .joke-close:hover{opacity:0.85;}
+</style>
+</head>
+<body>
+
+<!-- SEMESTER SELECTOR SCREEN -->
+<div id="sem-screen">
+  <div class="sem-logo">▸ EAC25</div>
+  <div class="sem-sub">SECTION K · AMRITA SCHOOL OF ENGINEERING</div>
+  <div class="sem-heading">Pick your semester</div>
+  <div class="sem-hint">// select to continue</div>
+  <div class="sem-grid">
+    <div class="sem-card" onclick="pickSem(1)">
+      <div class="sem-num">1</div>
+      <div class="sem-label">SEM I</div>
+      <span class="sem-badge done">DONE</span>
+    </div>
+    <div class="sem-card current" onclick="pickSem(2)">
+      <div class="sem-num">2</div>
+      <div class="sem-label">SEM II</div>
+      <span class="sem-badge live">LIVE</span>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(3)">
+      <div class="sem-num">3</div>
+      <div class="sem-label">SEM III</div>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(4)">
+      <div class="sem-num">4</div>
+      <div class="sem-label">SEM IV</div>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(5)">
+      <div class="sem-num">5</div>
+      <div class="sem-label">SEM V</div>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(6)">
+      <div class="sem-num">6</div>
+      <div class="sem-label">SEM VI</div>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(7)">
+      <div class="sem-num">7</div>
+      <div class="sem-label">SEM VII</div>
+    </div>
+    <div class="sem-card locked" onclick="pickSem(8)">
+      <div class="sem-num">8</div>
+      <div class="sem-label">SEM VIII</div>
+    </div>
+  </div>
+</div>
+
+<!-- JOKE MODAL -->
+<div id="joke-modal">
+  <div class="joke-box">
+    <span class="joke-emoji" id="joke-emoji">😂</span>
+    <div class="joke-text" id="joke-text"></div>
+    <div class="joke-sub" id="joke-sub"></div>
+    <button class="joke-close" onclick="closeJoke()">okay okay 💀</button>
+  </div>
+</div>
+
+
+<header>
+  <div class="logo">
+    ▸ EAC25
+    <div class="logo-meta">Section K · A306</div>
+  </div>
+  <div class="header-right">
+    <button class="admin-btn" id="admin-toggle-btn" onclick="toggleAdmin()">⚙ CR</button>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <button class="tab active" onclick="switchTab('timetable',this)">⊞ TIMETABLE</button>
+  <button class="tab" onclick="switchTab('announcements',this)">◎ NOTICES</button>
+  <button class="tab" onclick="switchTab('docs',this)">⬇ DOCS</button>
+  <button class="tab" onclick="switchTab('deadlines',this)">⏱ DEADLINES</button>
+</nav>
+
+<main>
+  <section id="timetable" class="section active">
+    <div class="sec-title">Weekly Timetable</div>
+    <div class="tt-meta">
+      <div class="tt-meta-item">Room: <span>A306</span></div>
+      <div class="tt-meta-item">Advisors: <span>Dr. Lalitha S &amp; Dr. Anil Kumar S</span></div>
+      <div class="tt-meta-item">W.E.F: <span>05-Jan-2026</span></div>
+      <div class="tt-meta-item" id="sec-display">Section: <span>K1</span></div>
+      <div class="section-toggle" style="margin-left:auto;">
+        <button class="seg-btn active" id="btn-k1" onclick="setSection('K1')">K1</button>
+        <button class="seg-btn" id="btn-k2" onclick="setSection('K2')">K2</button>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="ldot" style="background:#7c3aed"></div>Math</div>
+      <div class="legend-item"><div class="ldot" style="background:#ff4daa"></div>Comp Prog</div>
+      <div class="legend-item"><div class="ldot" style="background:#00d4ff"></div>Dig Elec</div>
+      <div class="legend-item"><div class="ldot" style="background:#ffd600"></div>Network</div>
+      <div class="legend-item"><div class="ldot" style="background:#00e676"></div>CHSE</div>
+      <div class="legend-item"><div class="ldot" style="background:#ff6b35"></div>IoT</div>
+      <div class="legend-item"><div class="ldot" style="background:#00bcd4"></div>Lab</div>
+      <div class="legend-item"><div class="ldot" style="background:#34d399"></div>Chem</div>
+      <div class="legend-item"><div class="ldot" style="background:#a78bfa"></div>GGI</div>
+    </div>
+    <div id="tt-display"></div>
+  </section>
+
+  <section id="announcements" class="section">
+    <div class="sec-title">Notices & Announcements</div>
+    <div id="ann-display"></div>
+  </section>
+
+  <section id="docs" class="section">
+    <div class="sec-title">Subject Documents</div>
+    <div id="docs-display"></div>
+  </section>
+
+  <section id="deadlines" class="section">
+    <div class="sec-title">Deadlines & Exams</div>
+    <div id="dl-display"></div>
+  </section>
+</main>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="admin-modal">
+    <div class="admin-hdr">
+      <span>⚙ CR PANEL</span>
+      <button class="close-btn" onclick="closeAdmin()">✕</button>
+    </div>
+
+    <div id="login-form">
+      <div class="fg">
+        <label>Password</label>
+        <input type="password" id="admin-pw" placeholder="Enter CR password" onkeydown="if(event.key==='Enter')doLogin()">
+        <div class="lerr" id="lerr">Wrong password.</div>
+      </div>
+      <button class="sbtn" onclick="doLogin()">LOGIN →</button>
+    </div>
+
+    <div id="admin-content" style="display:none">
+      <div class="atabs">
+        <button class="atab active" onclick="switchATab('a-notice',this)">Notice</button>
+        <button class="atab" onclick="switchATab('a-doc',this)">Upload Doc</button>
+        <button class="atab" onclick="switchATab('a-deadline',this)">Deadline</button>
+        <button class="atab" onclick="switchATab('a-manage',this)">Manage</button>
+      </div>
+
+      <div class="asec active" id="a-notice">
+        <input type="hidden" id="an-edit-id">
+        <div class="fg"><label>Title</label><input type="text" id="an-title" placeholder="e.g. Mid-sem schedule out"></div>
+        <div class="fg">
+          <label>Message</label>
+          <div class="toolbar">
+            <button class="tool-btn" onclick="fmt('bold')" title="Bold"><b>B</b></button>
+            <button class="tool-btn" onclick="fmt('italic')" title="Italic"><i>I</i></button>
+            <button class="tool-btn" onclick="fmt('underline')" title="Underline"><u>U</u></button>
+            <button class="tool-btn" onclick="insertMd('• ')" title="Bullet">• List</button>
+            <button class="tool-btn" onclick="insertMd('---')" title="Divider">— Line</button>
+            <span class="tool-hint">Select text then tap B/I/U</span>
+          </div>
+          <div id="an-body-editor" contenteditable="true"
+            style="min-height:90px;background:var(--bg);border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;padding:9px 12px;color:var(--text);font-family:var(--sans);font-size:0.85rem;outline:none;line-height:1.7;"
+            onkeydown="handleEditorKey(event)"
+            placeholder="Details..."></div>
+          <textarea id="an-body" style="display:none"></textarea>
+        </div>
+        <div class="fg">
+          <label>Image (optional)</label>
+          <div class="file-drop" onclick="document.getElementById('an-img').click()">
+            <div style="font-size:1.3rem">🖼</div>
+            <div class="file-drop-txt">Click to attach an image (JPG, PNG)</div>
+            <input type="file" id="an-img" accept=".jpg,.jpeg,.png,.gif,.webp" style="display:none" onchange="handleNoticeImg(this)">
+          </div>
+          <div id="an-img-preview" style="margin-top:0.5rem;display:none;">
+            <img id="an-img-thumb" style="width:100%;max-height:160px;object-fit:cover;border-radius:6px;border:1px solid var(--border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+              <span id="an-img-status" style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);"></span>
+              <button onclick="clearNoticeImg()" style="font-family:var(--mono);font-size:0.6rem;color:var(--red);background:none;border:none;cursor:pointer;">✕ Remove</button>
+            </div>
+          </div>
+        </div>
+        <div class="fg"><label>Priority</label>
+          <select id="an-pri"><option value="high">🔴 High — Urgent</option><option value="med" selected>🟡 Medium</option><option value="low">🟢 Low — FYI</option></select>
+        </div>
+        <button class="sbtn" id="an-submit-btn" onclick="addNotice()">POST NOTICE →</button>
+        <button class="sbtn" id="an-cancel-btn" onclick="cancelEditNotice()" style="display:none;background:var(--surface2);color:var(--muted);border:1px solid var(--border);margin-top:0.4rem;">✕ CANCEL EDIT</button>
+      </div>
+
+      <div class="asec" id="a-doc">
+        <div class="fg"><label>Subject</label>
+          <select id="doc-subj">
+            <option value="23MAT130">Engineering Mathematics II</option>
+            <option value="23ECE105">Computer Programming</option>
+            <option value="23EAC112">Digital Electronics</option>
+            <option value="23ECE114">Network Analysis</option>
+            <option value="23EAC111">CHSE</option>
+            <option value="23ECE184">Introduction to IoT</option>
+            <option value="23CHY103">Engineering Chemistry</option>
+            <option value="22ADM11">Glimpses of Glorious India</option>
+            <option value="23EAC182">Digital Electronics Lab</option>
+            <option value="23EAC181">CHSE Lab</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+        <div class="fg"><label>Document Name</label><input type="text" id="doc-nm" placeholder="e.g. Unit 2 — Network Theorems"></div>
+        <div class="fg">
+          <label>File</label>
+          <div class="file-drop" onclick="document.getElementById('doc-file').click()">
+            <div style="font-size:1.3rem">⬆</div>
+            <div class="file-drop-txt">Click to choose (PDF, PPTX, DOCX, Image)</div>
+            <input type="file" id="doc-file" accept=".pdf,.pptx,.docx,.png,.jpg,.jpeg" style="display:none" onchange="handleFile(this)">
+          </div>
+          <div id="sel-file-nm"></div>
+        </div>
+        <button class="sbtn" onclick="addDoc()">⬇ DOWNLOAD TO MY DEVICE</button>
+        <p style="font-family:var(--mono);font-size:0.57rem;color:var(--muted);margin-top:0.6rem;line-height:1.8;">
+          Step 1 — Pick file above → hit Download (saves to your device)<br>
+          Step 2 — Upload that file to Google Drive<br>
+          Step 3 — Paste the Drive share link below so classmates can access it
+        </p>
+        <div class="divider"></div>
+        <div class="fg"><label>Add Google Drive / External Link</label><input type="text" id="doc-lnk" placeholder="https://drive.google.com/..."></div>
+        <button class="sbtn sec" onclick="addDocLink()">ADD LINK →</button>
+      </div>
+
+      <div class="asec" id="a-deadline">
+        <input type="hidden" id="dl-edit-id">
+        <div class="fg"><label>Title</label><input type="text" id="dl-title" placeholder="e.g. Network Analysis Assignment 2"></div>
+        <div class="frow">
+          <div class="fg"><label>Subject</label>
+            <select id="dl-subj">
+              <option value="Engg Math II">Engg Math II</option>
+              <option value="Computer Prog">Computer Prog</option>
+              <option value="Digital Electronics">Digital Electronics</option>
+              <option value="Network Analysis">Network Analysis</option>
+              <option value="CHSE">CHSE</option>
+              <option value="IoT">IoT</option>
+              <option value="Engg Chemistry">Engg Chemistry</option>
+              <option value="Glimpses of India">Glimpses of India</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div class="fg"><label>Due Date</label><input type="date" id="dl-date"></div>
+        </div>
+        <div class="fg"><label>Type</label>
+          <select id="dl-type"><option>Assignment</option><option>Exam</option><option>Quiz</option><option>Lab Record</option><option>Project</option><option>Other</option></select>
+        </div>
+        <button class="sbtn" id="dl-submit-btn" onclick="addDeadline()">ADD DEADLINE →</button>
+        <button class="sbtn" id="dl-cancel-btn" onclick="cancelEditDeadline()" style="display:none;background:var(--surface2);color:var(--muted);border:1px solid var(--border);margin-top:0.4rem;">✕ CANCEL EDIT</button>
+      </div>
+
+      <div class="asec" id="a-manage">
+        <div class="fg"><label>Type</label>
+          <select id="mg-type" onchange="renderManage()">
+            <option value="notices">Announcements</option>
+            <option value="docs">Documents</option>
+            <option value="deadlines">Deadlines</option>
+          </select>
+        </div>
+        <div id="mg-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="install-banner" style="display:none;position:fixed;bottom:5rem;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:0.85rem 1.25rem;z-index:500;display:none;align-items:center;gap:1rem;max-width:340px;width:90%;box-shadow:0 4px 24px rgba(0,0,0,0.4);">
+  <div>
+    <div style="font-size:0.85rem;font-weight:700;font-family:var(--sans);">Install EAC25 Portal</div>
+    <div style="font-family:var(--mono);font-size:0.6rem;color:var(--muted);margin-top:2px;">Works offline · Timetable always available</div>
+  </div>
+  <button id="install-btn" style="background:var(--accent);color:#000;border:none;padding:7px 14px;border-radius:6px;font-family:var(--mono);font-size:0.68rem;font-weight:700;cursor:pointer;white-space:nowrap;">INSTALL</button>
+  <button onclick="document.getElementById('install-banner').style.display='none'" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;line-height:1;padding:0;">✕</button>
+</div>
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('install-banner').style.display = 'flex';
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome} = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner').style.display = 'none';
+  if(outcome==='accepted') showToast('App installed!');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').style.display = 'none';
+});
+</script>
+
+<script>
+// ─── TIMETABLE DATA ────────────────────────────────────────────────────────────
+const S = {
+  A:{n:'Engg Math II',      c:'23MAT130',cls:'cm'},
+  B:{n:'Computer Prog',     c:'23ECE105',cls:'cb'},
+  C:{n:'Digital Electronics',c:'23EAC112',cls:'cd'},
+  D:{n:'Network Analysis',  c:'23ECE114',cls:'cn'},
+  E:{n:'CHSE',              c:'23EAC111',cls:'ce'},
+  F:{n:'IoT',               c:'23ECE184',cls:'cf'},
+  G:{n:'CHSE Lab',          c:'23EAC181',cls:'cl'},
+  H:{n:'Dig Elec Lab',      c:'23EAC182',cls:'cl'},
+  I:{n:'Comp Prog Lab',     c:'23ECE182',cls:'cl'},
+  J:{n:'Glimpses of India', c:'22ADM11', cls:'cj'},
+  K:{n:'Engg Chemistry',    c:'23CHY103',cls:'ck'},
+  Y:{n:'Yoga',              c:'',        cls:'cj'},
+};
+
+// Returns array of period-objects for the given day and section
+function getDayPeriods(day, sec) {
+  const K1=sec==='K1', K2=sec==='K2';
+  // helper
+  const th = (time,key)=>({time,key});
+  const brk=(time,nm)=>({time,type:'break',n:nm});
+  const lab=(time,key,note)=>({time,key,isLab:true,note});
+
+  if(day==='Monday') {
+    const common = [
+      th('8:10–9:00','A'), th('9:00–9:50','C'), th('9:50–10:40','B'),
+      brk('10:40–11:00','☕ Tea Break'),
+      th('11:00–11:50','K'), {time:'11:50–12:40',type:'eval'},
+    ];
+    if(K1) return [
+      ...common,
+      brk('12:40–1:25','🍱 Lunch'),
+      lab('1:25–3:40','G','CHSE Lab'),   // K1 only
+    ];
+    else return [
+      ...common,
+      brk('12:40–2:00','🍱 Lunch'),      // K2: nothing after lunch
+    ];
+  }
+
+  if(day==='Tuesday') return [
+    th('8:10–9:00','J'), th('9:00–9:50','K'), th('9:50–10:40','B'),
+    brk('10:40–11:00','☕ Tea Break'),
+    th('11:00–11:50','E'), th('11:50–12:40','A'),
+    brk('12:40–1:25','🍱 Lunch'),
+    // K1 → Dig Elec Lab, K2 → IoT lab
+    K1 ? lab('1:25–3:40','H','Dig Elec Lab') : lab('1:25–3:40','F','MP Lab / H Lab'),
+    th('3:40–4:20','Y'),   // Yoga for both
+  ];
+
+  if(day==='Wednesday') {
+    const periods = [];
+    if(K1) periods.push(lab('8:10–10:25','F','MP Lab / H Lab'));
+    else    periods.push(lab('8:10–10:25','H','Dig Elec Lab'));
+    periods.push(brk('10:25–11:00','☕ Tea Break'));
+    periods.push(th('11:00–11:50','D'));
+    periods.push(th('11:50–12:40','A'));
+    if(K1) {
+      // K1: nothing after lunch
+      periods.push(brk('12:40–2:00','🍱 Lunch'));
+    } else {
+      // K2: CHSE lab after lunch
+      periods.push(brk('12:40–1:25','🍱 Lunch'));
+      periods.push(lab('1:25–3:40','G','CHSE Lab'));
+    }
+    return periods;
+  }
+
+  if(day==='Thursday') return [
+    // Morning: theory only → standard tea break 10:40–11:00
+    th('8:10–9:00','C'), th('9:00–9:50','D'), th('9:50–10:40','A'),
+    brk('10:40–11:00','☕ Tea Break'),
+    th('11:00–11:50','E'), th('11:50–12:40','K'),
+    // Has afternoon lab → lunch 12:40–1:25
+    brk('12:40–1:25','🍱 Lunch'),
+    lab('1:25–3:40','I','ECE Computer Lab'),
+  ];
+
+  if(day==='Friday') return [
+    // No lab at all → standard tea break 10:40–11:00, lunch till 2:00
+    th('8:10–9:00','B'), th('9:00–9:50','C'), th('9:50–10:40','D'),
+    brk('10:40–11:00','☕ Tea Break'),
+    th('11:00–11:50','J'), th('11:50–12:40','E'),
+    brk('12:40–2:00','🍱 Lunch'),
+    {time:'2:00–3:40',type:'placement'},
+  ];
+
+  return [];
+}
+
+function periodHTML(p) {
+  if(p.type==='break')     return `<div class="period cbreak"><div class="p-time">${p.time}</div><div class="p-name">${p.n}</div></div>`;
+  if(p.type==='eval')      return `<div class="period ceval"><div class="p-time">${p.time}</div><div class="p-name">📋 Evaluation</div></div>`;
+  if(p.type==='placement') return `<div class="period cpl"><div class="p-time">${p.time}</div><div class="p-name">Placement / Counselling</div></div>`;
+
+  if(p.key) {
+    const s=S[p.key];
+    return `<div class="period ${s.cls}">
+      <div class="p-time">${p.time}</div>
+      <div class="p-name">${s.n}</div>
+      <div class="p-code">${s.c}</div>
+      ${p.note?`<div class="p-note">${p.note}</div>`:''}
+    </div>`;
+  }
+  return '';
+}
+
+// ─── STATE ─────────────────────────────────────────────────────────────────────
+let curSec = localStorage.getItem('section')||'K1';
+const TODAY = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][new Date().getDay()];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+let cache = { notices:[], docs:[], deadlines:[] };
+
+function setSection(s) {
+  curSec=s; localStorage.setItem('section',s);
+  document.getElementById('btn-k1').classList.toggle('active',s==='K1');
+  document.getElementById('btn-k2').classList.toggle('active',s==='K2');
+  document.getElementById('sec-display').innerHTML=`Section: <span>${s}</span>`;
+  renderTT();
+}
+
+function getNextClass(periods){
+  const now=new Date();
+  const cur=now.getHours()*60+now.getMinutes();
+  for(const p of periods){
+    if(!p.time||p.type==='break')continue;
+    const parts=p.time.split('–');
+    if(!parts[0])continue;
+    const [h,m]=parts[0].trim().split(':').map(Number);
+    const start=h*60+m;
+    const [eh,em]=(parts[1]||'').trim().split(':').map(Number);
+    const end=(eh||0)*60+(em||0);
+    if(cur>=start&&cur<end) return{...p,status:'now'};
+    if(cur<start) return{...p,status:'next'};
+  }
+  return null;
+}
+
+function renderTT() {
+  const container=document.getElementById('tt-display');
+  container.innerHTML='';
+  let todayCard=null;
+  DAYS.forEach(day=>{
+    const isToday=day===TODAY;
+    const periods=getDayPeriods(day,curSec);
+    const card=document.createElement('div');
+    card.className='day-card'+(isToday?' is-today':'');
+
+    let nextBar='';
+    if(isToday){
+      const next=getNextClass(periods);
+      if(next){
+        const subName=next.key?S[next.key].n:(next.n||next.name||'');
+        const color=next.status==='now'?'var(--green)':'var(--accent)';
+        const label=next.status==='now'?'▶ NOW':'⏭ NEXT';
+        nextBar=`<div style="padding:7px 14px;background:${next.status==='now'?'rgba(0,230,118,0.08)':'rgba(0,212,255,0.06)'};border-bottom:1px solid var(--border);font-family:var(--mono);font-size:0.62rem;display:flex;align-items:center;gap:0.5rem;">
+          <span style="color:${color};font-weight:700;">${label}</span>
+          <span style="color:var(--text);">${subName}</span>
+          <span style="color:var(--muted);margin-left:auto;">${next.time}</span>
+        </div>`;
+      }
+    }
+
+    card.innerHTML=`
+      <div class="day-hdr${isToday?' today-hdr':''}">
+        <span>${day.toUpperCase()}</span>
+        ${isToday?'<span class="today-badge">TODAY</span>':''}
+      </div>
+      ${nextBar}
+      <div class="periods-row">${periods.map(periodHTML).join('')}</div>`;
+    container.appendChild(card);
+    if(isToday) todayCard=card;
+  });
+  if(todayCard){
+    setTimeout(()=>todayCard.scrollIntoView({behavior:'smooth',block:'start'}),300);
+  }
+}
+
+function linkify(text){
+  return text.replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;word-break:break-all;">$1</a>');
+}
+
+function bodyToHtml(body){
+  if(!body) return '';
+  // If body already contains HTML tags (new editor format), use directly
+  if(/<[a-z][\s\S]*>/i.test(body)) return linkify(body);
+  // Legacy plain text: convert bullets and --- to HTML
+  const lines = body.split('\n');
+  let html='', inList=false;
+  for(const line of lines){
+    const trimmed = line.trim();
+    if(trimmed.startsWith('•') || trimmed.startsWith('-') && trimmed.length>1 && !trimmed.startsWith('---')){
+      if(!inList){html+='<ul>';inList=true;}
+      html+=`<li>${linkify(trimmed.replace(/^[•-]\s*/,''))}</li>`;
+    } else {
+      if(inList){html+='</ul>';inList=false;}
+      if(trimmed==='---') html+='<hr>';
+      else if(trimmed==='') html+='<br>';
+      else html+=`<span>${linkify(trimmed)}</span><br>`;
+    }
+  }
+  if(inList) html+='</ul>';
+  return html;
+}
+
+function renderAnn() {
+  const items=[...cache.notices].sort((a,b)=>b.ts-a.ts);
+  const el=document.getElementById('ann-display');
+  if(!items.length){el.innerHTML='<div class="empty">// No announcements yet</div>';return;}
+  el.innerHTML=items.map(a=>`
+    <div class="card ${a.p==='high'?'bh':a.p==='med'?'bm':'bl'}">
+      <div class="card-meta"><span class="pdot ${a.p==='high'?'ph':a.p==='med'?'pm':'pl'}"></span><span>${a.date}</span>·<span>${a.p.toUpperCase()}</span></div>
+      <div class="card-title">${a.title}</div>
+      ${a.img?`<img src="${a.img}" style="width:100%;max-height:300px;object-fit:contain;border-radius:6px;margin:0.6rem 0;border:1px solid var(--border);background:#000;">`:''}
+      <div class="notice-body">${bodyToHtml(a.body)}</div>
+    </div>`).join('');
+}
+
+function getExt(n){return(n||'').split('.').pop().toLowerCase();}
+function subjDot(subj){
+  const m={'23MAT130':'di-math','23ECE105':'di-prog','23EAC112':'di-de',
+           '23ECE114':'di-net','23EAC111':'di-chse','23ECE184':'di-iot',
+           '23CHY103':'di-chem','22ADM11':'di-ggi','23EAC181':'di-lab',
+           '23EAC182':'di-lab','23ECE182':'di-lab','General':'di-gen'};
+  return m[subj]||'di-gen';
+}
+
+const SUBJ_NAMES = {
+  '23MAT130':'Engineering Mathematics II','23ECE105':'Computer Programming',
+  '23EAC112':'Digital Electronics','23ECE114':'Network Analysis',
+  '23EAC111':'CHSE','23ECE184':'Introduction to IoT','23EAC181':'CHSE Lab',
+  '23EAC182':'Digital Electronics Lab','23ECE182':'Computer Programming Lab',
+  '22ADM11':'Glimpses of Glorious India','23CHY103':'Engineering Chemistry','General':'General',
+};
+const SUBJ_ICONS = {
+  '23MAT130':'📐','23ECE105':'💻','23EAC112':'⚡','23ECE114':'🔌',
+  '23EAC111':'🖥','23ECE184':'📡','23EAC181':'🔬','23EAC182':'🔬',
+  '23ECE182':'🖥','22ADM11':'🏛','23CHY103':'⚗️','General':'📁',
+};
+const folderSort = {};
+
+function toggleFolder(id){
+  document.getElementById('fb-'+id).classList.toggle('open');
+  document.getElementById('fh-'+id).classList.toggle('open');
+}
+function setFolderSort(fid,val,btn){
+  folderSort[fid]=val;
+  document.querySelectorAll(`.sort-btn[data-fid="${fid}"]`).forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFolderFiles(fid);
+}
+function renderFolderFiles(fid){
+  const subj=document.getElementById('fb-'+fid).dataset.subj;
+  const docs=cache.docs.filter(d=>d.subj===subj);
+  const sort=folderSort[fid]||'newest';
+  const sorted=[...docs].sort((a,b)=>sort==='newest'?(b.ts||0)-(a.ts||0):sort==='oldest'?(a.ts||0)-(b.ts||0):a.nm.localeCompare(b.nm));
+  document.getElementById('fb-files-'+fid).innerHTML=sorted.map(d=>`
+    <div class="doc-item">
+      <div class="doc-icon ${subjDot(d.subj)}"></div>
+      <div class="doc-info"><div class="doc-name">${d.nm}</div><div class="doc-meta">${d.date}</div></div>
+      <a class="dl-btn" href="${d.lnk}" target="_blank" rel="noopener">↓ DOWNLOAD</a>
+    </div>`).join('');
+}
+
+function renderDocs(){
+  const docs=cache.docs;
+  const el=document.getElementById('docs-display');
+  if(!docs.length){el.innerHTML='<div class="empty">// No documents yet</div>';return;}
+  const ORDER=['23MAT130','23ECE105','23EAC112','23ECE114','23EAC111','23ECE184','23CHY103','22ADM11','23EAC181','23EAC182','23ECE182','General'];
+  const g={};
+  docs.forEach(d=>{if(!g[d.subj])g[d.subj]=[];g[d.subj].push(d);});
+  const keys=[...ORDER.filter(k=>g[k]),...Object.keys(g).filter(k=>!ORDER.includes(k))];
+  el.innerHTML=keys.map((subj,i)=>{
+    const items=g[subj],name=SUBJ_NAMES[subj]||subj,icon=SUBJ_ICONS[subj]||'📁',fid='f'+i;
+    const sort=folderSort[fid]||'newest';
+    const sorted=[...items].sort((a,b)=>sort==='newest'?(b.ts||0)-(a.ts||0):sort==='oldest'?(a.ts||0)-(b.ts||0):a.nm.localeCompare(b.nm));
+    return `
+      <div class="folder">
+        <div class="folder-header" id="fh-${fid}" onclick="toggleFolder('${fid}')">
+          <span class="folder-icon">${icon}</span>
+          <span class="folder-name">${name}</span>
+          <span class="folder-count">${items.length} file${items.length>1?'s':''}</span>
+          <span class="folder-chevron">▶</span>
+        </div>
+        <div class="folder-body" id="fb-${fid}" data-subj="${subj}">
+          <div class="folder-sort-bar">
+            <span class="sort-label">Sort:</span>
+            <button class="sort-btn ${sort==='newest'?'active':''}" data-fid="${fid}" onclick="setFolderSort('${fid}','newest',this)">Newest</button>
+            <button class="sort-btn ${sort==='oldest'?'active':''}" data-fid="${fid}" onclick="setFolderSort('${fid}','oldest',this)">Oldest</button>
+            <button class="sort-btn ${sort==='name'?'active':''}" data-fid="${fid}" onclick="setFolderSort('${fid}','name',this)">A–Z</button>
+          </div>
+          <div id="fb-files-${fid}">
+            ${sorted.map(d=>`
+              <div class="doc-item">
+                <div class="doc-icon ${subjDot(subj)}"></div>
+                <div class="doc-info"><div class="doc-name">${d.nm}</div><div class="doc-meta">${d.date}</div></div>
+                <a class="dl-btn" href="${d.lnk}" target="_blank" rel="noopener">↓ DOWNLOAD</a>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function daysLeft(ds){const t=new Date();t.setHours(0,0,0,0);const d=new Date(ds);d.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
+
+function renderDL(){
+  const items=[...cache.deadlines].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const el=document.getElementById('dl-display');
+  if(!items.length){el.innerHTML='<div class="empty">// No deadlines yet</div>';return;}
+  el.innerHTML=items.map(d=>{
+    const dl=daysLeft(d.date),dt=new Date(d.date);
+    const dn=dt.getDate(),mon=dt.toLocaleString('default',{month:'short'}).toUpperCase();
+    let cls='p-ok',txt=`${dl}d left`;
+    if(dl<0){cls='p-past';txt='Passed';}
+    else if(dl===0){cls='p-urgent';txt='TODAY!';}
+    else if(dl<=2){cls='p-urgent';txt=`${dl}d left`;}
+    else if(dl<=5)cls='p-soon';
+    return `<div class="dl-item">
+      <div class="dl-date">
+        <div class="dl-day" style="color:${dl<=2&&dl>=0?'var(--red)':dl<=5?'var(--yellow)':'var(--accent)'}">${dn}</div>
+        <div class="dl-mon">${mon}</div>
+      </div>
+      <div class="dl-divider"></div>
+      <div class="dl-info"><div class="dl-title">${d.title}</div><div class="dl-sub">${d.subj} · ${d.type}</div></div>
+      <span class="days-pill ${cls}">${txt}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── ADMIN ─────────────────────────────────────────────────────────────────────
+const ADMIN_PW='eac25cr'; // ← CHANGE THIS!
+function toggleAdmin(){const p=document.getElementById('admin-panel'),b=document.getElementById('admin-toggle-btn');if(p.classList.contains('open')){p.classList.remove('open');b.classList.remove('active');}else{p.classList.add('open');b.classList.add('active');}}
+function closeAdmin(){document.getElementById('admin-panel').classList.remove('open');document.getElementById('admin-toggle-btn').classList.remove('active');}
+document.getElementById('admin-panel').addEventListener('click',function(e){if(e.target===this)closeAdmin();});
+function doLogin(){
+  const pw=document.getElementById('admin-pw').value;
+  if(pw===ADMIN_PW){document.getElementById('login-form').style.display='none';document.getElementById('admin-content').style.display='block';}
+  else{document.getElementById('lerr').style.display='block';document.getElementById('admin-pw').value='';}
+}
+function switchATab(id,btn){document.querySelectorAll('.asec').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');if(id==='a-manage')renderManage();}
+
+// ─── CLOUDINARY IMAGE UPLOAD ──────────────────────────────────────────────────
+const CLOUDINARY_CLOUD = 'db1ezpfd4';
+const CLOUDINARY_PRESET = 'eac25_notices'; // unsigned upload preset
+
+let noticeImg=null; // will hold the Cloudinary URL after upload
+let noticeImgPending=null; // holds the File object before upload
+
+async function handleNoticeImg(input){
+  const file=input.files[0]; if(!file) return;
+  noticeImgPending=file;
+  // Show local preview immediately while upload happens in background
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('an-img-thumb').src=e.target.result;
+    document.getElementById('an-img-preview').style.display='block';
+    document.getElementById('an-img-status').textContent='⏳ Uploading image...';
+  };
+  reader.readAsDataURL(file);
+  // Upload to Cloudinary
+  try{
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',CLOUDINARY_PRESET);
+    fd.append('folder','eac25-notices');
+    const res=await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,{method:'POST',body:fd});
+    const data=await res.json();
+    if(data.secure_url){
+      noticeImg=data.secure_url;
+      document.getElementById('an-img-status').textContent='✓ Image ready';
+      document.getElementById('an-img-status').style.color='var(--green)';
+    } else {
+      throw new Error(data.error?.message||'Upload failed');
+    }
+  }catch(e){
+    document.getElementById('an-img-status').textContent='✗ Upload failed: '+e.message;
+    document.getElementById('an-img-status').style.color='var(--red)';
+    noticeImg=null;
+  }
+}
+function clearNoticeImg(){
+  noticeImg=null; noticeImgPending=null;
+  document.getElementById('an-img').value='';
+  document.getElementById('an-img-preview').style.display='none';
+  document.getElementById('an-img-thumb').src='';
+  document.getElementById('an-img-status').textContent='';
+}
+// Rich text editor helpers
+function fmt(cmd){document.execCommand(cmd,false,null);document.getElementById('an-body-editor').focus();}
+function insertMd(txt){
+  const el=document.getElementById('an-body-editor');
+  el.focus();
+  const sel=window.getSelection();
+  if(sel.rangeCount){
+    const range=sel.getRangeAt(0);
+    range.deleteContents();
+    const node=document.createTextNode(txt);
+    range.insertNode(node);
+    range.setStartAfter(node);range.setEndAfter(node);
+    sel.removeAllRanges();sel.addRange(range);
+  }
+}
+function handleEditorKey(e){
+  // Enter after a bullet continues the list
+  if(e.key==='Enter'){
+    const sel=window.getSelection();
+    if(sel.rangeCount){
+      const range=sel.getRangeAt(0);
+      const node=range.startContainer;
+      const text=node.textContent||'';
+      if(text.trimStart().startsWith('•')){
+        e.preventDefault();
+        document.execCommand('insertText',false,'\n• ');
+      }
+    }
+  }
+}
+
+async function addNotice(){
+  const title=document.getElementById('an-title').value.trim();
+  const editId=document.getElementById('an-edit-id').value;
+  const body=document.getElementById('an-body-editor').innerHTML.trim();
+  if(!title||!body||body==='<br>')return showToast('Fill all fields',true);
+  if(noticeImgPending&&!noticeImg)return showToast('Image still uploading, wait a moment',true);
+  showToast(editId?'Updating...':'Posting...');
+  try{
+    if(editId){
+      // UPDATE existing
+      await window._db.updateDoc(window._db.doc(window._firestore,'notices',editId),{
+        title,body,p:document.getElementById('an-pri').value,img:noticeImg||null,
+        editedDate:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+      });
+      cancelEditNotice();showToast('Notice updated!');
+    } else {
+      // NEW
+      await window._db.addDoc(window._db.collection(window._firestore,'notices'),{
+        title,body,p:document.getElementById('an-pri').value,img:noticeImg||null,
+        date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),ts:Date.now()
+      });
+      document.getElementById('an-title').value='';
+      document.getElementById('an-body-editor').innerHTML='';
+      clearNoticeImg();showToast('Notice posted!');
+    }
+  }catch(e){showToast('Error: '+e.message,true);}
+}
+function cancelEditNotice(){
+  document.getElementById('an-edit-id').value='';
+  document.getElementById('an-title').value='';
+  document.getElementById('an-body-editor').innerHTML='';
+  document.getElementById('an-submit-btn').textContent='POST NOTICE →';
+  document.getElementById('an-cancel-btn').style.display='none';
+  clearNoticeImg();
+}
+
+let pf={data:null,nm:null,sz:null};
+function handleFile(input){
+  const file=input.files[0];if(!file)return;
+  pf.nm=file.name;pf.sz=(file.size/1024).toFixed(0)+' KB';
+  document.getElementById('sel-file-nm').textContent='✓ '+file.name+' ('+pf.sz+') — ready to download';
+  const r=new FileReader();r.onload=e=>{pf.data=e.target.result;};r.readAsDataURL(file);
+  if(!document.getElementById('doc-nm').value)document.getElementById('doc-nm').value=file.name.replace(/\.[^.]+$/,'');
+}
+function addDoc(){
+  if(!pf.data)return showToast('Select a file first',true);
+  const nm=document.getElementById('doc-nm').value.trim();
+  if(!nm)return showToast('Enter document name',true);
+  const a=document.createElement('a');a.href=pf.data;a.download=nm+'.'+pf.nm.split('.').pop();a.click();
+  showToast('Downloaded! Now upload to Drive & add the link below.');
+  document.getElementById('doc-nm').value='';document.getElementById('sel-file-nm').textContent='';document.getElementById('doc-file').value='';pf={data:null,nm:null,sz:null};
+}
+function toDirectLink(url){
+  const match=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(match)return`https://drive.google.com/uc?export=download&id=${match[1]}`;
+  return url;
+}
+async function addDocLink(){
+  const lnk=document.getElementById('doc-lnk').value.trim(),nm=document.getElementById('doc-nm').value.trim();
+  if(!lnk||!nm)return showToast('Enter name and link',true);
+  showToast('Saving...');
+  try{
+    await window._db.addDoc(window._db.collection(window._firestore,'docs'),{
+      subj:document.getElementById('doc-subj').value,nm,lnk:toDirectLink(lnk),
+      ts:Date.now(),date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})
+    });
+    document.getElementById('doc-lnk').value='';document.getElementById('doc-nm').value='';
+    showToast('Document added!');
+  }catch(e){showToast('Error: '+e.message,true);}
+}
+async function addDeadline(){
+  const title=document.getElementById('dl-title').value.trim(),date=document.getElementById('dl-date').value;
+  const editId=document.getElementById('dl-edit-id').value;
+  if(!title||!date)return showToast('Fill all fields',true);
+  showToast(editId?'Updating...':'Saving...');
+  try{
+    if(editId){
+      await window._db.updateDoc(window._db.doc(window._firestore,'deadlines',editId),{
+        title,subj:document.getElementById('dl-subj').value,date,type:document.getElementById('dl-type').value
+      });
+      cancelEditDeadline();showToast('Deadline updated!');
+    } else {
+      await window._db.addDoc(window._db.collection(window._firestore,'deadlines'),{
+        title,subj:document.getElementById('dl-subj').value,date,type:document.getElementById('dl-type').value,ts:Date.now()
+      });
+      document.getElementById('dl-title').value='';document.getElementById('dl-date').value='';
+      showToast('Deadline added!');
+    }
+  }catch(e){showToast('Error: '+e.message,true);}
+}
+function cancelEditDeadline(){
+  document.getElementById('dl-edit-id').value='';
+  document.getElementById('dl-title').value='';
+  document.getElementById('dl-date').value='';
+  document.getElementById('dl-submit-btn').textContent='ADD DEADLINE →';
+  document.getElementById('dl-cancel-btn').style.display='none';
+}
+
+function startEdit(type,id){
+  const item=(cache[type]||[]).find(i=>i.id===id);
+  if(!item)return;
+  if(type==='notices'){
+    // Switch to notice tab
+    document.querySelectorAll('.asec').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('a-notice').classList.add('active');
+    document.querySelector('.atab').classList.add('active');
+    // Populate fields
+    document.getElementById('an-edit-id').value=id;
+    document.getElementById('an-title').value=item.title||'';
+    document.getElementById('an-body-editor').innerHTML=item.body||'';
+    document.getElementById('an-pri').value=item.p||'med';
+    if(item.img){noticeImg=item.img;document.getElementById('an-img-thumb').src=item.img;document.getElementById('an-img-preview').style.display='block';}
+    document.getElementById('an-submit-btn').textContent='UPDATE NOTICE →';
+    document.getElementById('an-cancel-btn').style.display='block';
+    document.getElementById('an-title').scrollIntoView({behavior:'smooth'});
+  }
+  if(type==='deadlines'){
+    document.querySelectorAll('.asec').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+    document.getElementById('a-deadline').classList.add('active');
+    document.querySelectorAll('.atab')[2].classList.add('active');
+    document.getElementById('dl-edit-id').value=id;
+    document.getElementById('dl-title').value=item.title||'';
+    document.getElementById('dl-date').value=item.date||'';
+    document.getElementById('dl-subj').value=item.subj||'General';
+    document.getElementById('dl-type').value=item.type||'Assignment';
+    document.getElementById('dl-submit-btn').textContent='UPDATE DEADLINE →';
+    document.getElementById('dl-cancel-btn').style.display='block';
+    document.getElementById('dl-title').scrollIntoView({behavior:'smooth'});
+  }
+}
+
+function renderManage(){
+  const type=document.getElementById('mg-type').value,items=cache[type]||[];
+  const list=document.getElementById('mg-list');
+  if(!items.length){list.innerHTML='<div class="empty" style="padding:0.8rem">// Nothing here</div>';return;}
+  list.innerHTML=items.map(item=>`
+    <div class="mg-item">
+      <span class="mg-name">${item.title||item.nm||'—'}</span>
+      <div style="display:flex;gap:0.35rem;flex-shrink:0;">
+        ${type!=='docs'?`<button class="editbtn" onclick="startEdit('${type}','${item.id}')">EDIT</button>`:''}
+        <button class="delbtn" onclick="delItem('${type}','${item.id}')">DEL</button>
+      </div>
+    </div>`).join('');
+}
+async function delItem(type,id){
+  try{await window._db.deleteDoc(window._db.doc(window._firestore,type,id));showToast('Deleted.');}
+  catch(e){showToast('Error: '+e.message,true);}
+}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+}
+function showToast(msg,err=false){
+  const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'var(--red)':'var(--green)';
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ─── SEMESTER SELECTOR ────────────────────────────────────────────────────────
+const JOKES = [
+  { sem:1, emoji:'😎', text:'Sem 1? That was last chapter bro.', sub:'Already done. You survived. Barely.' },
+  { sem:3, emoji:'🐴', text:'Hold your horses!', sub:'Pass Sem 2 first before galloping into Sem 3. One step at a time.' },
+  { sem:4, emoji:'🔮', text:'Are you a time traveller?', sub:"Sem 4 content isn't even written yet. Come back in a couple years." },
+  { sem:5, emoji:'💀', text:'Bro thinks he\'s a final year.', sub:"Sem 5? You\'re still learning what a resistor is. Chill." },
+  { sem:6, emoji:'🚀', text:'Slow down Elon!', sub:"Sem 6 is so far away we don\'t even know what subjects exist yet." },
+  { sem:7, emoji:'🤡', text:'Okay who let you in here?', sub:"Sem 7 is reserved for people who\'ve survived 3 years. You haven\'t even survived 1." },
+  { sem:8, emoji:'🎓', text:'Future graduate detected.', sub:"Sem 8? At this point just skip college and apply for a PhD bro." },
+];
+
+function pickSem(n){
+  if(n === 2){
+    // Enter the portal
+    document.getElementById('sem-screen').classList.add('hidden');
+    sessionStorage.setItem('sem-picked','2');
+    return;
+  }
+  if(n === 1){
+    showJoke({ emoji:'😎', text:'Sem 1? That\'s ancient history bro.', sub:'Already done. You survived orientation week and that\'s enough.' });
+    return;
+  }
+  // All other sems — show joke
+  const joke = JOKES.find(j=>j.sem===n) || { emoji:'🤔', text:'Nice try.', sub:"That semester doesn\'t exist in your timeline yet." };
+  showJoke(joke);
+}
+
+function showJoke(joke){
+  document.getElementById('joke-emoji').textContent = joke.emoji;
+  document.getElementById('joke-text').textContent = joke.text;
+  document.getElementById('joke-sub').textContent = joke.sub;
+  document.getElementById('joke-modal').classList.add('open');
+}
+
+function closeJoke(){
+  document.getElementById('joke-modal').classList.remove('open');
+}
+
+// Check if user already picked sem this session
+if(sessionStorage.getItem('sem-picked')==='2'){
+  document.getElementById('sem-screen').classList.add('hidden');
+}
+// Save choice when entering
+const _origPickSem = pickSem;
+setSection(curSec);
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAdM1W0DgOwabyC-3I_SG-WFD-8NsEObbM",
+  authDomain: "eac25-portal.firebaseapp.com",
+  projectId: "eac25-portal",
+  storageBucket: "eac25-portal.firebasestorage.app",
+  messagingSenderId: "66862627009",
+  appId: "1:66862627009:web:e7c79aeee5d592123ebc40"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window._firestore = db;
+window._db = { addDoc, deleteDoc, doc, updateDoc, collection };
+
+onSnapshot(collection(db,'notices'), snap=>{
+  cache.notices = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAnn();
+});
+onSnapshot(collection(db,'docs'), snap=>{
+  cache.docs = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderDocs();
+});
+onSnapshot(collection(db,'deadlines'), snap=>{
+  cache.deadlines = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderDL();
+});
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(()=>console.log('SW registered'))
+      .catch(e=>console.log('SW error:',e));
+  });
+}
+</script>
+</body>
+</html>
