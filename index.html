@@ -561,7 +561,8 @@ const S = {
   I:{n:'Comp Prog Lab',     c:'23ECE182',cls:'cl'},
   J:{n:'Glimpses of India', c:'22ADM11', cls:'cj'},
   K:{n:'Engg Chemistry',    c:'23CHY103',cls:'ck'},
-  Y:{n:'Yoga',              c:'',        cls:'cj'},
+  Y1:{n:'Yoga - Day Scholars',              c:'',        cls:'cj'},
+  Y2:{n:'Yoga - Hostellers',              c:'',        cls:'cj'},
 };
 
 // Returns array of period-objects for the given day and section
@@ -596,7 +597,7 @@ function getDayPeriods(day, sec) {
     brk('12:40–1:25','🍱 Lunch'),
     // K1 → Dig Elec Lab, K2 → IoT lab
     K1 ? lab('1:25–3:40','H','Dig Elec Lab') : lab('1:25–3:40','F','MP Lab / H Lab'),
-    th('3:40–4:20','Y'),   // Yoga for both
+    th('3:40–4:20','Y1'),   // Yoga for both
   ];
 
   if(day==='Wednesday') {
@@ -625,6 +626,7 @@ function getDayPeriods(day, sec) {
     // Has afternoon lab → lunch 12:40–1:25
     brk('12:40–1:25','🍱 Lunch'),
     lab('1:25–3:40','I','ECE Computer Lab'),
+    th('3:40–4:20','Y2'),
   ];
 
   if(day==='Friday') return [
